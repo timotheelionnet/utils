@@ -1,0 +1,85 @@
+classdef spotGenerationParams
+    
+     properties (GetAccess = 'public', SetAccess = 'public')
+         nPts; % number of spots in image
+         bgMean; % mean value of the background
+         bgStd; % st dev of the background noise (modeled as a gaussian distrbution)
+
+         loc; % if you want to generate randomly distributed spot
+         % positions and intensities, ignore this parameters and use
+         % the function generate_spots_positions_and_intensities that will
+         % generate the dlocpix spot coordinates table (recommended).
+         % if you do want to generate a deterministic array of spot positions
+         % and intensities, fill in this array with the following format:
+         % each row is a spot with the following columns: [x,y,z,I] 
+
+         imSize; % size of the image to be modeled entered as [nx,ny] or [ny ny nz] for z-stack
+         maxBounds; % set to 0 to allow spot centers in the entire image.
+         % set to  [xmin ymin zmin;xmax,ymax,zmax] to ensure that spot centers are encompassed
+         % within the boundaries to avoid spot cropping.
+
+         brightness; % [mean stdev] of the spot brightness distribution. 
+         % spot brightnesses are gaussian distributed around the mean
+         
+         voxSize; % keep to 1 to ensure all units in voxels
+
+         psf; % [sigma_xy sigma_z] of the psf modeled as a 3D gaussian, in voxel units: 
+
+         cutSize; % size of the ROI over which the spot intensity is calculated 
+         %(in units of PSF sigma)
+
+         gain; % gain of the sensor (only used when mode set to 'poisson').
+
+         mode; % photon noise model. 
+         % Set to '' for no noise; 
+         % set to 'poisson' for poisson shot noise. When choosing poisson
+         % noise, noise is modeled in each pixzel as gain*poissrnd(intensity/gain)
+
+         zMode; % how the intensity profile of the psf is modeled in z. 
+         % Set to 'gaussian' for gaussian distribution (recommended); 
+         % set to 'integrated gaussian' for gaussian integrated over the voxel
+         % height.
+         
+         generatePairs; %set to zero to generate unique spots. 
+         % Set to 1 to generate spot pairs.
+
+         distBetweenSpotPairs; % [mean stdev] of the distribution 
+         % of distances between spot pairs if generating spot pairs 
+         
+     end
+     
+      methods
+        %% initialize object
+        function obj = spotGenerationParams()
+            obj.initDefaultProperties;
+            %obj.initProperties;
+        end
+        
+        function initDefaultProperties(obj)
+            obj.defaultProperties.nPts = 30;
+            obj.defaultProperties.bgMean = 200;
+            obj.defaultProperties.bgStd = 10;
+            obj.defaultProperties.loc = [];
+            obj.defaultProperties.imSize = [512,512,15];
+            obj.defaultProperties.maxBounds = [10,10,3;500,500,12];
+            obj.defaultProperties.brightness = [1000,0];
+            obj.defaultProperties.voxSize = [1,1,1];
+            obj.defaultProperties.psf = [1.35,2];
+            obj.defaultProperties.cutSize = 3;
+            obj.defaultProperties.gain = 1;
+            obj.defaultProperties.mode = '';
+            obj.defaultProperties.zMode = 'gaussian';
+            obj.defaultProperties.generatePairs = 0;
+            obj.defaultProperties.distBetweenSpotPairs = 5;
+            
+        end
+        
+        function initOptions(obj)
+            obj.options.recursive = obj.defaultOptions.recursive; 
+            obj.options.verbose = obj.defaultOptions.verbose;
+            obj.options.useTerminal = obj.defaultOptions.useTerminal;
+            obj.options.batchMode = obj.defaultOptions.batchMode;
+            obj.options.uniqueMissingTag = obj.defaultOptions.uniqueMissingTag;
+        end
+      end
+end
